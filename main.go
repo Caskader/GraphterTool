@@ -60,6 +60,6 @@ func K(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	equation := compiler.Parse("(10x)^1 (+)^1 (10)^1 = (10y)^2")
+	equation := compiler.Parse("(10x)^1 (+)^1 (10y)^1")
 	graphter.GetPoints(equation[0])
 }
