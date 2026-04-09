@@ -7,7 +7,6 @@ import (
 
 	"github.com/gorilla/websocket"
 	"siddh.com/compiler"
-	"siddh.com/graphter"
 )
 
 var upgrader = websocket.Upgrader{
@@ -60,6 +59,6 @@ func K(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	equation := compiler.Parse("(10x)^1 (+)^1 (10)^1 = (10y)^2")
-	graphter.GetPoints(equation[0])
+	compiler.Format("100xyz abh h ")
+	// graphter.GetPoints(equation[0])
 }
