@@ -2,6 +2,7 @@ package graphter
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 
 	"siddh.com/compiler"
@@ -32,7 +33,9 @@ func add(firstTerm compiler.Term, secondTerm compiler.Term, x int, y int) float6
 }
 
 func calculateValueOfExpression(activeTermsIds []string, expression map[string]compiler.Term, x int, y int) float64 {
-	var value float64 = 0
+	var value float64
+	var foundValue bool = false
+
 	for h := 0; h < len(activeTermsIds); h++ {
 		currID := activeTermsIds[h]
 		if currID == "D" {
@@ -62,11 +65,17 @@ func calculateValueOfExpression(activeTermsIds []string, expression map[string]c
 					activeTermsIds[rightIdx] = "D"
 
 					value = val
+					foundValue = true
 
 				}
 			}
 		}
 	}
+
+	if foundValue == false {
+
+	}
+
 	return value
 }
 
@@ -132,19 +141,23 @@ func GetPoints(equation [2]map[string]compiler.Term) {
 	var leftHandSide map[string]compiler.Term = equation[0]
 	var RightHandSide map[string]compiler.Term = equation[1]
 
-	// 1. Get the original order once
+	// 1. Get a stable order of term IDs for deterministic evaluation
 	var originalOrderLeft []string
 	var originalOrderRight []string
-	for i := range leftHandSide {
-		originalOrderLeft = append(originalOrderLeft, i)
+
+	for id := range leftHandSide {
+		originalOrderLeft = append(originalOrderLeft, id)
 	}
-	for i := range RightHandSide {
-		originalOrderRight = append(originalOrderRight, i)
+	for id := range RightHandSide {
+		originalOrderRight = append(originalOrderRight, id)
 	}
+
+	sort.Strings(originalOrderLeft)
+	sort.Strings(originalOrderRight)
 
 	for x := 0; x < 10; x++ {
 		for y := 0; y < 10; y++ {
-			// 2. Create a FRESH copy of IDs for every single (x, y) coordinate
+			// 2. Create a fresh copy of IDs for every single (x, y) coordinate
 			activeTermsIdsLeft := make([]string, len(originalOrderLeft))
 			copy(activeTermsIdsLeft, originalOrderLeft)
 			var lhsValue = calculateValueOfExpression(activeTermsIdsLeft, leftHandSide, x, y)
