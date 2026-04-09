@@ -31,6 +31,45 @@ func add(firstTerm compiler.Term, secondTerm compiler.Term, x int, y int) float6
 	return a1 + a2
 }
 
+func calculateValueOfExpression(activeTermsIds []string, expression map[string]compiler.Term, x int, y int) float64 {
+	var value float64 = 0
+	for h := 0; h < len(activeTermsIds); h++ {
+		currID := activeTermsIds[h]
+		if currID == "D" {
+			continue
+		} // Skip already processed terms
+
+		term := expression[currID]
+
+		if term.Type == "O" {
+
+			switch term.Operator {
+			case "+":
+				// Boundary check to prevent crashes
+				if h > 0 && h < len(activeTermsIds)-1 {
+					leftIdx := h - 1
+					rightIdx := h + 1
+
+					val := add(expression[activeTermsIds[leftIdx]], expression[activeTermsIds[rightIdx]], x, y)
+
+					// Update the left term with the new calculated value
+					t := expression[activeTermsIds[leftIdx]]
+					t.Value = val
+					expression[activeTermsIds[leftIdx]] = t
+
+					// Mark operator and right operand as Done
+					activeTermsIds[h] = "D"
+					activeTermsIds[rightIdx] = "D"
+
+					value = val
+
+				}
+			}
+		}
+	}
+	return value
+}
+
 // func GetPoints(a map[string]compiler.Term) {
 
 // 	var activeTermsIds []string = []string{}
@@ -88,52 +127,41 @@ func add(firstTerm compiler.Term, secondTerm compiler.Term, x int, y int) float6
 // 	}
 
 // }
-func GetPoints(a map[string]compiler.Term) {
+func GetPoints(equation [2]map[string]compiler.Term) {
+
+	var leftHandSide map[string]compiler.Term = equation[0]
+	var RightHandSide map[string]compiler.Term = equation[1]
+
 	// 1. Get the original order once
-	var originalOrder []string
-	for i := range a {
-		originalOrder = append(originalOrder, i)
+	var originalOrderLeft []string
+	var originalOrderRight []string
+	for i := range leftHandSide {
+		originalOrderLeft = append(originalOrderLeft, i)
+	}
+	for i := range RightHandSide {
+		originalOrderRight = append(originalOrderRight, i)
 	}
 
-	for x := 0; x < 100; x++ {
-		for y := 0; y < 100; y++ {
+	for x := 0; x < 10; x++ {
+		for y := 0; y < 10; y++ {
 			// 2. Create a FRESH copy of IDs for every single (x, y) coordinate
-			activeTermsIds := make([]string, len(originalOrder))
-			copy(activeTermsIds, originalOrder)
+			activeTermsIdsLeft := make([]string, len(originalOrderLeft))
+			copy(activeTermsIdsLeft, originalOrderLeft)
+			var lhsValue = calculateValueOfExpression(activeTermsIdsLeft, leftHandSide, x, y)
 
-			for h := 0; h < len(activeTermsIds); h++ {
-				currID := activeTermsIds[h]
-				if currID == "D" {
-					continue
-				} // Skip already processed terms
+			activeTermsIdsRight := make([]string, len(originalOrderRight))
+			copy(activeTermsIdsRight, originalOrderRight)
 
-				term := a[currID]
+			var RhsValue = calculateValueOfExpression(activeTermsIdsRight, RightHandSide, x, y)
 
-				if term.Type == "O" {
-
-					switch term.Operator {
-					case "+":
-						// Boundary check to prevent crashes
-						if h > 0 && h < len(activeTermsIds)-1 {
-							leftIdx := h - 1
-							rightIdx := h + 1
-
-							val := add(a[activeTermsIds[leftIdx]], a[activeTermsIds[rightIdx]], x, y)
-
-							// Update the left term with the new calculated value
-							t := a[activeTermsIds[leftIdx]]
-							t.Value = val
-							a[activeTermsIds[leftIdx]] = t
-
-							// Mark operator and right operand as Done
-							activeTermsIds[h] = "D"
-							activeTermsIds[rightIdx] = "D"
-
-							fmt.Printf("At (%d,%d) Value: %f\n", x, y, val)
-						}
-					}
-				}
+			if lhsValue == RhsValue {
+				fmt.Print("x = ")
+				fmt.Print(x)
+				fmt.Print(" y = ")
+				fmt.Print(y)
+				fmt.Print("\n")
 			}
+
 		}
 	}
 }
