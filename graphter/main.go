@@ -2,6 +2,7 @@ package graphter
 
 import (
 	"fmt"
+	"math"
 	"sort"
 	"strconv"
 	"strings"
@@ -22,6 +23,13 @@ func GetTermValue(term compiler.Term, x int, y int) float64 {
 			if term.Variable == "y" {
 				value *= float64(y)
 			}
+			exponent, err := strconv.ParseFloat(term.Exponent, 64)
+			if err != nil {
+				// handle error
+			}
+
+			value = powerToTheExponent(value, exponent)
+
 			return value
 		} else {
 			// when the term has subterms
@@ -46,6 +54,14 @@ func GetComplexTermValue(term compiler.Term, x int, y int, activeTermsIds []stri
 			var subactiveTermsIds []string = make([]string, len(term.Subterm))
 			copy(subactiveTermsIds, term.Subterm)
 			value = calculateValueOfExpression(subactiveTermsIds, expression, x, y)
+
+			exponent, err := strconv.ParseFloat(term.Exponent, 64)
+			if err != nil {
+				// handle error
+			}
+
+			value = powerToTheExponent(value, exponent)
+
 			return value
 		}
 
@@ -83,6 +99,10 @@ func multiply(firstTerm compiler.Term, secondTerm compiler.Term, x int, y int, a
 	return a1 - a2
 }
 
+func powerToTheExponent(value float64, exponent float64) float64 {
+	return math.Pow(value, exponent)
+}
+
 func GetPoints(equation [2]map[string]compiler.Term) {
 
 	var leftHandSide map[string]compiler.Term = equation[0]
@@ -106,8 +126,8 @@ func GetPoints(equation [2]map[string]compiler.Term) {
 	sort.Strings(originalOrderLeft)
 	sort.Strings(originalOrderRight)
 
-	for x := 0; x < 1000; x++ {
-		for y := 0; y < 1000; y++ {
+	for x := 0; x <= 100; x++ {
+		for y := 0; y <= 100; y++ {
 			// 2. Create a fresh copy of IDs for every single (x, y) coordinate
 			activeTermsIdsLeft := make([]string, len(originalOrderLeft))
 			copy(activeTermsIdsLeft, originalOrderLeft)
