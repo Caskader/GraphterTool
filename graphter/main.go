@@ -4,138 +4,85 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
+	"strings"
 
 	"siddh.com/compiler"
 )
 
 func GetTermValue(term compiler.Term, x int, y int) float64 {
+	var value float64 = 0
+	if term.Type == "N" {
+		if len(term.Subterm) == 0 {
+			value, _ := strconv.ParseFloat(term.Constant, 64)
 
-	value, _ := strconv.ParseFloat(term.Constant, 64)
+			if term.Variable == "x" {
+				value *= float64(x)
+			}
 
-	if term.Variable == "x" {
-		value *= float64(x)
-	}
-
-	if term.Variable == "y" {
-		value *= float64(y)
+			if term.Variable == "y" {
+				value *= float64(y)
+			}
+			return value
+		} else {
+			// when the term has subterms
+			fmt.Print("erororor")
+			value = 0
+		}
 	}
 
 	// fmt.Println(value)
 	return value
 }
 
-// function to add two terms in an equation
-func add(firstTerm compiler.Term, secondTerm compiler.Term, x int, y int) float64 {
-	a1 := GetTermValue(firstTerm, x, y)
-	a2 := GetTermValue(secondTerm, x, y)
+func GetComplexTermValue(term compiler.Term, x int, y int, activeTermsIds []string, expression map[string]compiler.Term) float64 { //all the terms which may have subterms are called complex terms
+	var value float64 = 0
 
-	return a1 + a2
-}
+	if term.Type == "N" {
 
-func calculateValueOfExpression(activeTermsIds []string, expression map[string]compiler.Term, x int, y int) float64 {
-	var value float64
-	var foundValue bool = false
-
-	for h := 0; h < len(activeTermsIds); h++ {
-		currID := activeTermsIds[h]
-		if currID == "D" {
-			continue
-		} // Skip already processed terms
-
-		term := expression[currID]
-
-		if term.Type == "O" {
-
-			switch term.Operator {
-			case "+":
-				// Boundary check to prevent crashes
-				if h > 0 && h < len(activeTermsIds)-1 {
-					leftIdx := h - 1
-					rightIdx := h + 1
-
-					val := add(expression[activeTermsIds[leftIdx]], expression[activeTermsIds[rightIdx]], x, y)
-
-					// Update the left term with the new calculated value
-					t := expression[activeTermsIds[leftIdx]]
-					t.Value = val
-					expression[activeTermsIds[leftIdx]] = t
-
-					// Mark operator and right operand as Done
-					activeTermsIds[h] = "D"
-					activeTermsIds[rightIdx] = "D"
-
-					value = val
-					foundValue = true
-
-				}
-			}
+		if len(term.Subterm) == 0 {
+			value = GetTermValue(term, x, y)
+			return value
+		} else {
+			var subactiveTermsIds []string = make([]string, len(term.Subterm))
+			copy(subactiveTermsIds, term.Subterm)
+			value = calculateValueOfExpression(subactiveTermsIds, expression, x, y)
+			return value
 		}
-	}
-
-	if foundValue == false {
 
 	}
 
 	return value
 }
 
-// func GetPoints(a map[string]compiler.Term) {
+// function to add two terms in an equation
+func add(firstTerm compiler.Term, secondTerm compiler.Term, x int, y int, activeTermsIds []string, expression map[string]compiler.Term) float64 {
+	a1 := GetComplexTermValue(firstTerm, x, y, activeTermsIds, expression)
+	a2 := GetComplexTermValue(secondTerm, x, y, activeTermsIds, expression)
 
-// 	var activeTermsIds []string = []string{}
+	return a1 + a2
+}
 
-// 	for i := range a {
-// 		activeTermsIds = append(activeTermsIds, i)
-// 	}
-// 	fmt.Print(activeTermsIds)
+func subtract(firstTerm compiler.Term, secondTerm compiler.Term, x int, y int, activeTermsIds []string, expression map[string]compiler.Term) float64 {
+	a1 := GetComplexTermValue(firstTerm, x, y, activeTermsIds, expression)
+	a2 := GetComplexTermValue(secondTerm, x, y, activeTermsIds, expression)
 
-// 	var activeTermsCache []string = activeTermsIds
+	return a1 - a2
+}
 
-// 	for x := 0; x < 10; x++ {
-// 		for y := 0; y < 10; y++ {
-// 			activeTermsIds = activeTermsCache
-// 			for h := 0; h < len(activeTermsIds); h++ {
-// 				var i string = activeTermsIds[h]
-// 				var term compiler.Term = a[i]
+func devide(firstTerm compiler.Term, secondTerm compiler.Term, x int, y int, activeTermsIds []string, expression map[string]compiler.Term) float64 {
+	a1 := GetComplexTermValue(firstTerm, x, y, activeTermsIds, expression)
+	a2 := GetComplexTermValue(secondTerm, x, y, activeTermsIds, expression)
 
-// 				// checking for operators
+	return a1 - a2
+}
 
-// 				if term.Type == "O" {
-// 					switch term.Operator {
-// 					case "+":
-// 						fmt.Print(h)
-// 						var value float64 = add(a[activeTermsIds[h-1]], a[activeTermsIds[h+1]], x, y)
+func multiply(firstTerm compiler.Term, secondTerm compiler.Term, x int, y int, activeTermsIds []string, expression map[string]compiler.Term) float64 {
+	a1 := GetComplexTermValue(firstTerm, x, y, activeTermsIds, expression)
+	a2 := GetComplexTermValue(secondTerm, x, y, activeTermsIds, expression)
 
-// 						activeTermsIds[h] = "D" // D for done
-// 						activeTermsIds[h+1] = "D"
+	return a1 - a2
+}
 
-// 						t := a[activeTermsIds[h-1]]
-// 						var newTerm compiler.Term = compiler.Term{
-// 							Constant:     t.Constant,
-// 							Variable:     t.Variable,
-// 							Exponent:     t.Exponent,
-// 							ExponentTerm: t.ExponentTerm,
-// 							Type:         t.Type,
-// 							Operator:     t.Operator,
-// 							Subterm:      t.Subterm,
-// 							ID:           t.ID,
-// 							Value:        value, // added the value of addition in here
-// 						}
-// 						a[activeTermsIds[h-1]] = newTerm
-// 						fmt.Print("for x:")
-// 						fmt.Print(x)
-// 						fmt.Print("y:")
-// 						fmt.Print(y)
-// 						fmt.Print("value is = ")
-// 						fmt.Print(value)
-
-// 					}
-// 				}
-
-// 			}
-// 		}
-// 	}
-
-// }
 func GetPoints(equation [2]map[string]compiler.Term) {
 
 	var leftHandSide map[string]compiler.Term = equation[0]
@@ -146,17 +93,21 @@ func GetPoints(equation [2]map[string]compiler.Term) {
 	var originalOrderRight []string
 
 	for id := range leftHandSide {
-		originalOrderLeft = append(originalOrderLeft, id)
+		if strings.Count(id, ".") == 1 {
+			originalOrderLeft = append(originalOrderLeft, id)
+		}
 	}
 	for id := range RightHandSide {
-		originalOrderRight = append(originalOrderRight, id)
+		if strings.Count(id, ".") == 1 {
+			originalOrderRight = append(originalOrderRight, id)
+		}
 	}
 
 	sort.Strings(originalOrderLeft)
 	sort.Strings(originalOrderRight)
 
-	for x := 0; x < 10; x++ {
-		for y := 0; y < 10; y++ {
+	for x := 0; x < 1000; x++ {
+		for y := 0; y < 1000; y++ {
 			// 2. Create a fresh copy of IDs for every single (x, y) coordinate
 			activeTermsIdsLeft := make([]string, len(originalOrderLeft))
 			copy(activeTermsIdsLeft, originalOrderLeft)

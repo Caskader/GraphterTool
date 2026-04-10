@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
-
 	"siddh.com/compiler"
 	"siddh.com/graphter"
 )
@@ -61,6 +60,6 @@ func K(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	equation := compiler.Parse("(10x)^1 (+)^1 (10y)^1 = (20x)^1 (+)^1 (10y)^1 ")
+	equation := compiler.Parse("((1x)^1 (+)^1 (1y)^1)^1 (+)^1 ((1x)^1 (+)^1 (1y)^1)^1 = (10)^1  (+)^1 (10x)^1")
 	graphter.GetPoints(equation)
 }
