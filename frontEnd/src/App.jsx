@@ -11,15 +11,15 @@ function App() {
   // Function to handle sending the equation
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+    setError(null)
+
+
     if (!equation.trim()) {
       setError('Please enter an equation')
       return
     }
 
     setLoading(true)
-    setError(null)
-
     try {
       const response = await fetch('http://localhost:8080/api/equation', {
         method: 'POST',

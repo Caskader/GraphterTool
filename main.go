@@ -1,16 +1,17 @@
 package main
 
 import (
+	"fmt"
+
 	"siddh.com/compiler"
 	"siddh.com/graphter"
 	"siddh.com/network"
-	"fmt"
 )
 
 func CalculatePoints(response network.ResponseData) {
 	// "((1x)^1 (+)^1 (1y)^1)^1 (+)^1 ((1x)^1 (+)^1 (1y)^1)^1 = (10)^1  (+)^1 (10x)^1"
 	_ = response.Id
-	
+
 	querry := response.Message
 	fmt.Println(querry)
 	equation := compiler.Parse(querry)
@@ -26,8 +27,8 @@ func ProcessEquation(equationStr string) ([][2]int, error) {
 
 func main() {
 	// equation := compiler.Parse("((1x)^1 (+)^1 (1y)^1)^1 (+)^1 ((1x)^1 (+)^1 (1y)^1)^1 = (10)^1  (+)^1 (10x)^1")
-	equation := compiler.Parse("(x)^1 = (y)^1")
-	fmt.Print(graphter.GetPoints(equation))
-	fmt.Print(equation)
-	// network.Start(CalculatePoints, ProcessEquation)
+	// equation := compiler.Parse("(1x)^1 = (1y)^1")
+	// fmt.Print(graphter.GetPoints(equation))
+	// fmt.Print(equation)
+	network.Start(CalculatePoints, ProcessEquation)
 }
