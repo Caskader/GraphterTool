@@ -1,9 +1,9 @@
 package compiler
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
+	"fmt"
 )
 
 // in this algorithm all entities including operators are counted as terms

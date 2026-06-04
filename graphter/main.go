@@ -103,10 +103,11 @@ func powerToTheExponent(value float64, exponent float64) float64 {
 	return math.Pow(value, exponent)
 }
 
-func GetPoints(equation [2]map[string]compiler.Term) {
+func GetPoints(equation [2]map[string]compiler.Term) [][2]int {
 
 	var leftHandSide map[string]compiler.Term = equation[0]
 	var RightHandSide map[string]compiler.Term = equation[1]
+	var points [][2]int
 
 	// 1. Get a stable order of term IDs for deterministic evaluation
 	var originalOrderLeft []string
@@ -139,13 +140,16 @@ func GetPoints(equation [2]map[string]compiler.Term) {
 			var RhsValue = calculateValueOfExpression(activeTermsIdsRight, RightHandSide, x, y)
 
 			if lhsValue == RhsValue {
-				fmt.Print("x = ")
-				fmt.Print(x)
-				fmt.Print(" y = ")
-				fmt.Print(y)
-				fmt.Print("\n")
+				// fmt.Print("x = ")
+				// fmt.Print(x)
+				// fmt.Print(" y = ")
+				// fmt.Print(y)
+				// fmt.Print("\n")
+				point := [2]int{x, y}
+				points = append(points, point)
 			}
 
 		}
 	}
+	return points
 }
