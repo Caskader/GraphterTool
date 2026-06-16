@@ -10,6 +10,7 @@ import (
 	"siddh.com/compiler"
 )
 
+// TODO: add rounding points
 type Chunk struct {
 	id            int
 	points        [][2]float64
