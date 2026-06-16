@@ -12,23 +12,26 @@ func CalculatePoints(response network.ResponseData) {
 	// "((1x)^1 (+)^1 (1y)^1)^1 (+)^1 ((1x)^1 (+)^1 (1y)^1)^1 = (10)^1  (+)^1 (10x)^1"
 	_ = response.Id
 
-	querry := response.Message
-	fmt.Println(querry)
-	equation := compiler.Parse(querry)
-	points := graphter.GetPoints(equation)
+	query := response.Message
+	fmt.Println(query)
+	//equation := compiler.Parse(query)
+	var points [][2]float64
 	_ = points
 }
 
-func ProcessEquation(equationStr string) ([][2]int, error) {
+func ProcessEquation(equationStr string, startingPoint [2]int, endingPoint [2]int) ([][2]float64, error) {
 	equation := compiler.Parse(equationStr)
-	points := graphter.GetPoints(equation)
+	points := graphter.GetPoints(equation, 2, startingPoint, endingPoint)
 	return points, nil
 }
 
 func main() {
 	// equation := compiler.Parse("((1x)^1 (+)^1 (1y)^1)^1 (+)^1 ((1x)^1 (+)^1 (1y)^1)^1 = (10)^1  (+)^1 (10x)^1")
-	// equation := compiler.Parse("(1x)^1 = (1y)^1")
-	// fmt.Print(graphter.GetPoints(equation))
-	// fmt.Print(equation)
+	//equation := compiler.Parse("(1x)^2 = (1y)^1")
+	//var p = graphter.GetPoints(equation, 3)
+	//for i := 0; i < len(p); i++ {
+	//	fmt.Println(p[i])
+	//}
+	//fmt.Print(equation)
 	network.Start(CalculatePoints, ProcessEquation)
 }

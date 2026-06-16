@@ -15,17 +15,19 @@ type ResponseData struct {
 }
 
 type EquationRequest struct {
-	Equation string `json:"equation"`
+	Equation      string `json:"equation"`
+	StartingPoint [2]int `json:"StartingPoint"`
+	EndingPoint   [2]int `json:"EndingPoint"`
 }
 
 type PointsResponse struct {
-	Points [][2]int `json:"points"`
-	Status string   `json:"status"`
-	Error  string   `json:"error,omitempty"`
+	Points [][2]float64 `json:"points"`
+	Status string       `json:"status"`
+	Error  string       `json:"error,omitempty"`
 }
 
 var HandleInput func(ResponseData)
-var HandleEquation func(string) ([][2]int, error)
+var HandleEquation func(string, [2]int, [2]int) ([][2]float64, error)
 
 func enableCORS(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -81,7 +83,7 @@ func equationHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(PointsResponse{
 			Status: "error",
 			Error:  "Method not allowed",
-			Points: [][2]int{},
+			Points: [][2]float64{},
 		})
 		return
 	}
@@ -93,7 +95,7 @@ func equationHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(PointsResponse{
 			Status: "error",
 			Error:  "Invalid request body",
-			Points: [][2]int{},
+			Points: [][2]float64{},
 		})
 		return
 	}
@@ -103,18 +105,19 @@ func equationHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(PointsResponse{
 			Status: "error",
 			Error:  "Equation handler not configured",
-			Points: [][2]int{},
+			Points: [][2]float64{},
 		})
 		return
 	}
 
-	points, err := HandleEquation(req.Equation)
+	points, err := HandleEquation(req.Equation, req.StartingPoint, req.EndingPoint)
+	fmt.Println(req.StartingPoint, req.EndingPoint)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(PointsResponse{
 			Status: "error",
 			Error:  err.Error(),
-			Points: [][2]int{},
+			Points: [][2]float64{},
 		})
 		return
 	}
@@ -131,7 +134,7 @@ func sendData(id int64) {
 
 }
 
-func Start(q func(ResponseData), eq func(string) ([][2]int, error)) {
+func Start(q func(ResponseData), eq func(string, [2]int, [2]int) ([][2]float64, error)) {
 	http.HandleFunc("/api/data", dataHandler)
 	http.HandleFunc("/api/equation", equationHandler)
 

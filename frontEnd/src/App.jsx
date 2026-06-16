@@ -26,7 +26,7 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ equation: equation.trim() }),
+        body: JSON.stringify({ equation: equation.trim(),StartingPoint :[0,0],Endingpoint :[10,10]}),
       })
 
       if (!response.ok) {

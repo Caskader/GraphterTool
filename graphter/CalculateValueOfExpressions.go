@@ -4,7 +4,7 @@ import (
 	"siddh.com/compiler"
 )
 
-func calculateValueOfExpression(activeTermsIds []string, expression map[string]compiler.Term, x int, y int) float64 {
+func calculateValueOfExpression(activeTermsIds []string, expression map[string]compiler.Term, x float64, y float64) float64 {
 	var value float64
 	var foundValue bool = false
 	var FoundOperator bool = false
