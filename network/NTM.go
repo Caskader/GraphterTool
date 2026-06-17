@@ -15,9 +15,10 @@ type ResponseData struct {
 }
 
 type EquationRequest struct {
-	Equation      string `json:"equation"`
-	StartingPoint [2]int `json:"StartingPoint"`
-	EndingPoint   [2]int `json:"EndingPoint"`
+	// Equation is kept as RawMessage for flexibility (string or object)
+	Equation      json.RawMessage `json:"equation"`
+	StartingPoint [2]int          `json:"StartingPoint"`
+	EndingPoint   [2]int          `json:"EndingPoint"`
 }
 
 type PointsResponse struct {
@@ -27,7 +28,9 @@ type PointsResponse struct {
 }
 
 var HandleInput func(ResponseData)
-var HandleEquation func(string, [2]int, [2]int) ([][2]float64, error)
+
+// HandleEquation now accepts a raw JSON payload for the equation (either a string or an object)
+var HandleEquation func(json.RawMessage, [2]int, [2]int) ([][2]float64, error)
 
 func enableCORS(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -88,8 +91,8 @@ func equationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req EquationRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
+	var body map[string]json.RawMessage
+	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(PointsResponse{
@@ -110,8 +113,30 @@ func equationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	points, err := HandleEquation(req.Equation, req.StartingPoint, req.EndingPoint)
-	fmt.Println(req.StartingPoint, req.EndingPoint)
+	// extract equation raw payload (support string or object)
+	var eqRaw json.RawMessage
+	if v, ok := body["equation"]; ok {
+		eqRaw = v
+	} else if v, ok := body["Equation"]; ok {
+		eqRaw = v
+	}
+
+	// extract starting/ending points (try multiple keys)
+	var sp [2]int
+	var ep [2]int
+	if v, ok := body["StartingPoint"]; ok {
+		_ = json.Unmarshal(v, &sp)
+	} else if v, ok := body["Startingpoint"]; ok {
+		_ = json.Unmarshal(v, &sp)
+	}
+	if v, ok := body["EndingPoint"]; ok {
+		_ = json.Unmarshal(v, &ep)
+	} else if v, ok := body["Endingpoint"]; ok {
+		_ = json.Unmarshal(v, &ep)
+	}
+
+	points, err := HandleEquation(eqRaw, sp, ep)
+	fmt.Println(sp, ep)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(PointsResponse{
@@ -134,7 +159,7 @@ func sendData(id int64) {
 
 }
 
-func Start(q func(ResponseData), eq func(string, [2]int, [2]int) ([][2]float64, error)) {
+func Start(q func(ResponseData), eq func(json.RawMessage, [2]int, [2]int) ([][2]float64, error)) {
 	http.HandleFunc("/api/data", dataHandler)
 	http.HandleFunc("/api/equation", equationHandler)
 

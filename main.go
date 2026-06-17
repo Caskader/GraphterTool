@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"siddh.com/compiler"
@@ -19,9 +20,30 @@ func CalculatePoints(response network.ResponseData) {
 	_ = points
 }
 
-func ProcessEquation(equationStr string, startingPoint [2]int, endingPoint [2]int) ([][2]float64, error) {
-	equation := compiler.Parse(equationStr)
+type Message struct {
+	Latex string
+}
+
+func ProcessEquation(equationRaw json.RawMessage, startingPoint [2]int, endingPoint [2]int) ([][2]float64, error) {
+	var m Message
+
+	err := json.Unmarshal(equationRaw, &m)
+
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	fmt.Println(m.Latex)
+	fmt.Println("hi")
+	// pretty-print the incoming JSON equation payload to the terminal
+	// var pretty bytes.Buffer
+	// json.Indent(&pretty, equationRaw, "", "  ")
+	// fmt.Println("Equation (raw):", string(equationRaw))
+	// fmt.Println("Equation (JSON):\n" + pretty.String())
+
+	equation := compiler.Parse(m.Latex)
 	points := graphter.GetPoints(equation, 2, startingPoint, endingPoint)
+	// otherwise there's no points to return
 	return points, nil
 }
 

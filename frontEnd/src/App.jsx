@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import './App.css'
+import 'mathlive'
 
 function App() {
   const [equation, setEquation] = useState('')
@@ -7,6 +8,7 @@ function App() {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const canvasRef = useRef(null)
+  const mathfieldRef = useRef(null)
 
   // Function to handle sending the equation
   const handleSubmit = async (e) => {
@@ -14,7 +16,9 @@ function App() {
     setError(null)
 
 
-    if (!equation.trim()) {
+    // read latex from mathlive field
+    const latex = mathfieldRef.current ? mathfieldRef.current.getValue() : equation
+    if (!latex || !latex.trim()) {
       setError('Please enter an equation')
       return
     }
@@ -26,7 +30,7 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ equation: equation.trim(),StartingPoint :[0,0],Endingpoint :[10,10]}),
+        body: JSON.stringify({ equation: { latex: latex.trim() }, StartingPoint: [0,0], Endingpoint: [10,10] }),
       })
 
       if (!response.ok) {
@@ -152,13 +156,11 @@ function App() {
 
       <div style={styles.inputSection}>
         <form onSubmit={handleSubmit} style={styles.form}>
-          <input
-            type="text"
-            placeholder="Enter equation (e.g., ((1x)^1 (+)^1 (1y)^1)^1)"
-            value={equation}
-            onChange={(e) => setEquation(e.target.value)}
+          <math-field
+            ref={mathfieldRef}
             style={styles.input}
-            disabled={loading}
+            placeholder="Enter equation (LaTeX)"
+            readOnly={loading}
           />
           <button type="submit" style={styles.button} disabled={loading}>
             {loading ? 'Processing...' : 'Graph Equation'}
