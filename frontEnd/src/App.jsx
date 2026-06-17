@@ -181,34 +181,34 @@ function App() {
               />
             </div>
 
-            <div style={styles.pointsSection}>
-              <h2>Points ({points.length} total)</h2>
-              <div style={styles.pointsTableContainer}>
-                <table style={styles.table}>
-                  <thead>
-                    <tr style={styles.tableHeader}>
-                      <th style={styles.th}>X</th>
-                      <th style={styles.th}>Y</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {points.slice(0, 20).map((point, idx) => (
-                      <tr key={idx} style={idx % 2 === 0 ? styles.evenRow : styles.oddRow}>
-                        <td style={styles.td}>{point[0]}</td>
-                        <td style={styles.td}>{point[1]}</td>
-                      </tr>
-                    ))}
-                    {points.length > 20 && (
-                      <tr>
-                        <td colSpan="2" style={styles.moreRow}>
-                          ... and {points.length - 20} more points
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            {/*<div style={styles.pointsSection}>*/}
+            {/*  <h2>Points ({points.length} total)</h2>*/}
+            {/*  <div style={styles.pointsTableContainer}>*/}
+            {/*    <table style={styles.table}>*/}
+            {/*      <thead>*/}
+            {/*        <tr style={styles.tableHeader}>*/}
+            {/*          <th style={styles.th}>X</th>*/}
+            {/*          <th style={styles.th}>Y</th>*/}
+            {/*        </tr>*/}
+            {/*      </thead>*/}
+            {/*      <tbody>*/}
+            {/*        {points.slice(0, 20).map((point, idx) => (*/}
+            {/*          <tr key={idx} style={idx % 2 === 0 ? styles.evenRow : styles.oddRow}>*/}
+            {/*            <td style={styles.td}>{point[0]}</td>*/}
+            {/*            <td style={styles.td}>{point[1]}</td>*/}
+            {/*          </tr>*/}
+            {/*        ))}*/}
+            {/*        {points.length > 20 && (*/}
+            {/*          <tr>*/}
+            {/*            <td colSpan="2" style={styles.moreRow}>*/}
+            {/*              ... and {points.length - 20} more points*/}
+            {/*            </td>*/}
+            {/*          </tr>*/}
+            {/*        )}*/}
+            {/*      </tbody>*/}
+            {/*    </table>*/}
+            {/*  </div>*/}
+            {/*</div>*/}
           </>
         )}
         {!loading && points.length === 0 && !error && (

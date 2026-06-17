@@ -146,7 +146,8 @@ func GetPointsInChunk(equation [2]map[string]compiler.Term, accuracy int, c Chun
 
 			var RhsValue = calculateValueOfExpression(activeTermsIdsRight, RightHandSide, float64(x)/float64(resolution), float64(y)/float64(resolution))
 
-			if lhsValue == RhsValue {
+			a := lhsValue - RhsValue
+			if math.Round(a*100)/100 == 0 {
 				// fmt.Print("x = ")
 				// fmt.Print(x)
 				// fmt.Print(" y = ")
