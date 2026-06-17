@@ -2,63 +2,33 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"net/http"
 
-	"github.com/gorilla/websocket"
 	"siddh.com/compiler"
+	"siddh.com/graphter"
+	"siddh.com/network"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
+func CalculatePoints(response network.ResponseData) {
+	// "((1x)^1 (+)^1 (1y)^1)^1 (+)^1 ((1x)^1 (+)^1 (1y)^1)^1 = (10)^1  (+)^1 (10x)^1"
+	_ = response.Id
+
+	querry := response.Message
+	fmt.Println(querry)
+	equation := compiler.Parse(querry)
+	points := graphter.GetPoints(equation)
+	_ = points
 }
 
-func webSocketHandler(w http.ResponseWriter, r *http.Request) {
-	// data := map[string]interface{}{
-	// 	"ni": 10,
-	// }
-	// jsonData, err := json.Marshal(data)
-
-	conn, err := upgrader.Upgrade(w, r, nil)
-
-	if err != nil {
-		log.Println(err)
-	}
-	defer conn.Close()
-
-	for {
-		_, msg, err := conn.ReadMessage()
-
-		if err != nil {
-			log.Println(err)
-			break
-		}
-
-		// var jsonMap map[string]interface{}
-		// json.Unmarshal(msg, &jsonMap)
-
-		// log.Printf("got message %s \n", msg)
-		fmt.Print(compiler.Parse((string(msg))))
-		// err = conn.WriteMessage(websocket.TextMessage, msg)
-		err = conn.WriteMessage(websocket.TextMessage, []byte("got it"))
-
-		if err != nil {
-			log.Println(err)
-			break
-		}
-
-	}
-}
-
-func K(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("<html>hi</html>"))
+func ProcessEquation(equationStr string) ([][2]int, error) {
+	equation := compiler.Parse(equationStr)
+	points := graphter.GetPoints(equation)
+	return points, nil
 }
 
 func main() {
-	compiler.Format("100xyz abh h ")
-	// graphter.GetPoints(equation[0])
+	// equation := compiler.Parse("((1x)^1 (+)^1 (1y)^1)^1 (+)^1 ((1x)^1 (+)^1 (1y)^1)^1 = (10)^1  (+)^1 (10x)^1")
+	// equation := compiler.Parse("(1x)^1 = (1y)^1")
+	// fmt.Print(graphter.GetPoints(equation))
+	// fmt.Print(equation)
+	network.Start(CalculatePoints, ProcessEquation)
 }
