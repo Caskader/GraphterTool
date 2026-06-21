@@ -34,7 +34,7 @@ func ProcessEquation(equationRaw json.RawMessage, startingPoint [2]int, endingPo
 	}
 
 	fmt.Println(m.Latex)
-	fmt.Println("hi")
+	fmt.Println(compiler.Format(m.Latex))
 	// pretty-print the incoming JSON equation payload to the terminal
 	// var pretty bytes.Buffer
 	// json.Indent(&pretty, equationRaw, "", "  ")
