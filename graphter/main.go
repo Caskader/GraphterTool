@@ -148,14 +148,14 @@ func GetPointsInChunk(equation [2]map[string]compiler.Term, accuracy int, c Chun
 
 			a := lhsValue - RhsValue
 			if math.Round(a*100)/100 == 0 {
-				// fmt.Print("x = ")
-				// fmt.Print(x)
-				// fmt.Print(" y = ")
-				// fmt.Print(y)
-				// fmt.Print("\n")
 				point := [2]float64{float64(x) / float64(resolution), float64(y) / float64(resolution)}
 				points = append(points, point)
 			}
+
+			//if a == 0 {
+			//	point := [2]float64{float64(x) / float64(resolution), float64(y) / float64(resolution)}
+			//	points = append(points, point)
+			//}
 
 		}
 	}

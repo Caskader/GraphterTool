@@ -1,9 +1,9 @@
 package compiler
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
-	"fmt"
 )
 
 // in this algorithm all entities including operators are counted as terms
@@ -46,7 +46,9 @@ func GetTerm(i int, raw []string, idPointer uint16, prefix string, TermContainer
 				nidPointer, TermContainer, h, id = GetTerm(h, raw, nidPointer, prefix+"."+strconv.Itoa(int(idPointer)), TermContainer)
 				subtermsId = append(subtermsId, id)
 			} else if raw[h] == ")" {
+
 				expo = raw[h+2] // get the value after two places of the term
+
 				if expo == "(" {
 					// currently the feature of giving a term as an exponent is not availale
 				}

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 
 	"siddh.com/compiler"
 	"siddh.com/graphter"
@@ -32,17 +33,17 @@ func ProcessEquation(equationRaw json.RawMessage, startingPoint [2]int, endingPo
 	if err != nil {
 		fmt.Print(err)
 	}
-
-	fmt.Println(m.Latex)
-	fmt.Println(compiler.Format(m.Latex))
+	formattedEquation := compiler.Format(m.Latex)
 	// pretty-print the incoming JSON equation payload to the terminal
 	// var pretty bytes.Buffer
 	// json.Indent(&pretty, equationRaw, "", "  ")
 	// fmt.Println("Equation (raw):", string(equationRaw))
 	// fmt.Println("Equation (JSON):\n" + pretty.String())
-
-	equation := compiler.Parse(m.Latex)
+	fmt.Fprintln(os.Stdout, "raw equation ", m.Latex)
+	fmt.Fprintln(os.Stdout, "formatted equation ", formattedEquation)
+	equation := compiler.Parse(formattedEquation)
 	points := graphter.GetPoints(equation, 2, startingPoint, endingPoint)
+
 	// otherwise there's no points to return
 	return points, nil
 }
